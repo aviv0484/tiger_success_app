@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>חיזוק שרירי הנמ"ר - מעקב הצלחות רגשיות</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Heebo', sans-serif;
+            background: linear-gradient(135deg, #fef7ed 0%, #fff 100%);
+        }
+        
+        .app-header {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #dc2626;
+        }
+        
+        .app-subtitle {
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: #7c2d12;
+        }
+        
+        .belt-card {
+            background: linear-gradient(135deg, #fff 0%, #fef7ed 100%);
+            border: 2px solid #fed7aa;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .success-btn {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 24px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .success-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+        }
+        
+        .category-btn {
+            background: #fff;
+            border: 2px solid #fed7aa;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .category-btn:hover, .category-btn.selected {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            transform: translateY(-1px);
+        }
+        
+        .progress-bar {
+            background: #fed7aa;
+            border-radius: 20px;
+            height: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.5s ease;
+        }
+        
+        .stat-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+        
+        .belt-colors {
+            white: #f8fafc;
+            yellow: #fef3c7;
+            orange: #fed7aa;
+            green: #dcfce7;
+            blue: #dbeafe;
+            brown: #d6d3d1;
+            black: #374151;
+        }
+        
+        .therapist-dashboard {
+            background: #f8fafc;
+        }
+        
+        .chart-container {
+            height: 400px;
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    
+    <!-- Initial Welcome/Registration Screen -->
+    <div id="welcomeScreen" class="min-h-screen flex flex-col items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 text-center">
+            <img src="https://cdn1.genspark.ai/user-upload-image/rmbg_generated/0_5b77bea6-587c-4ceb-8c88-afb24fbccc17" alt="לוגו נמר מחוק" class="w-32 h-auto mx-auto mb-6">
+            
+            <h1 class="text-3xl font-bold text-red-600 mb-2">ברוכים הבאים!</h1>
+            <p class="text-gray-600 mb-8">בחרו את סוג המשתמש שלכם</p>
+            
+            <div class="space-y-4">
+                <button onclick="showFamilyLogin()" class="w-full success-btn">
+                    <i class="fas fa-home ml-2"></i>
+                    כניסה למשפחות
+                </button>
+                
+                <div class="text-sm text-gray-500 mt-6">
+                    מטפלים? השתמשו בקישור המיוחד שקיבלתם
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Family Login Screen -->
+    <div id="familyLoginScreen" class="min-h-screen flex-col items-center justify-center p-4 hidden">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+            <img src="https://cdn1.genspark.ai/user-upload-image/rmbg_generated/0_5b77bea6-587c-4ceb-8c88-afb24fbccc17" alt="לוגו נמר מחוק" class="w-24 h-auto mx-auto mb-6">
+            
+            <h2 class="text-2xl font-bold text-red-600 text-center mb-6">כניסה למשפחות</h2>
+            
+            <form onsubmit="loginFamily(event)" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">שם החניך/ה</label>
+                    <input type="text" id="childName" required class="w-full px-4 py-3 border-2 border-orange-200 rounded-lg focus:border-red-500 focus:outline-none">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">סיסמה</label>
+                    <input type="password" id="familyPassword" required class="w-full px-4 py-3 border-2 border-orange-200 rounded-lg focus:border-red-500 focus:outline-none">
+                </div>
+                
+                <button type="submit" class="w-full success-btn">
+                    <i class="fas fa-sign-in-alt ml-2"></i>
+                    כניסה
+                </button>
+            </form>
+            
+            <button onclick="showWelcome()" class="w-full mt-4 text-gray-500 hover:text-gray-700">
+                <i class="fas fa-arrow-right ml-1"></i>
+                חזרה
+            </button>
+        </div>
+    </div>
+
+    <!-- Family Dashboard -->
+    <div id="familyDashboard" class="min-h-screen p-4 hidden">
+        <div class="max-w-md mx-auto">
+            <!-- Header with Logo and Tiger -->
+            <div class="bg-white rounded-2xl p-6 mb-6 text-center shadow-sm">
+                <img src="https://cdn1.genspark.ai/user-upload-image/rmbg_generated/0_5b77bea6-587c-4ceb-8c88-afb24fbccc17" alt="לוגו נמר מחוק" class="w-20 h-auto mx-auto mb-4">
+                
+                <div class="flex items-center justify-center gap-4">
+                    <div>
+                        <h1 class="app-header">חיזוק שרירי הנמ"ר</h1>
+                        <p class="app-subtitle" id="childNameDisplay">יומן ההצלחות של</p>
+                    </div>
+                    <img src="https://cdn1.genspark.ai/user-upload-image/rmbg_generated/0_0b1de0b1-e708-440e-a70d-f07632b4256d" alt="נמר מסקוט" class="w-16 h-auto">
+                </div>
+            </div>
+
+            <!-- Current Belt Level -->
+            <div class="belt-card p-6 mb-6">
+                <div class="text-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">דרגת החגורה שלכם כרגע</h2>
+                    <div class="text-sm text-gray-600">חגורה</div>
+                </div>
+                
+                <div class="flex justify-center mb-4">
+                    <div id="currentBelt" class="w-16 h-16 rounded-full bg-white border-4 border-gray-300 flex items-center justify-center text-2xl font-bold">
+                        ל
+                    </div>
+                </div>
+                
+                <div class="text-center mb-4">
+                    <p class="text-lg font-medium" id="beltName">חגורה לבנה</p>
+                    <p class="text-sm text-gray-600">0/5 נקודות לדרגה הבאה</p>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%" id="progressBar"></div>
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <div class="text-yellow-600 font-medium">
+                        <i class="fas fa-trophy ml-1"></i>
+                        באנו נתחיל לעקוב אחר ההצלחות!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="stat-card">
+                    <div class="text-2xl font-bold text-green-600" id="weeklyCount">1</div>
+                    <div class="text-xs text-gray-600">השבוע</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-2xl font-bold text-orange-600" id="beltLevel">דרגת חגורה</div>
+                    <div class="text-xs text-gray-600">1</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-2xl font-bold text-red-600" id="totalCount">סה"כ הצלחות</div>
+                    <div class="text-xs text-gray-600">0</div>
+                </div>
+            </div>
+
+            <!-- Main Action Button -->
+            <button onclick="showSuccessForm()" class="w-full success-btn mb-6">
+                <i class="fas fa-plus ml-2"></i>
+                תיעוד הצלחה חדשה
+            </button>
+
+            <!-- History Button -->
+            <button onclick="showHistory()" class="w-full bg-white border-2 border-orange-200 text-gray-700 py-4 rounded-xl font-medium">
+                <i class="fas fa-history ml-2"></i>
+                היסטוריית הצלחות
+            </button>
+
+            <!-- Stats Button -->
+            <button onclick="showStats()" class="w-full bg-white border-2 border-orange-200 text-gray-700 py-4 rounded-xl font-medium mt-4">
+                <i class="fas fa-chart-bar ml-2"></i>
+                נתונים והתקדמות
+            </button>
+
+            <!-- Logout -->
+            <button onclick="logout()" class="w-full text-gray-400 text-sm mt-6 py-2">
+                <i class="fas fa-sign-out-alt ml-1"></i>
+                יציאה
+            </button>
+        </div>
+    </div>
+
+    <!-- Success Form Modal -->
+    <div id="successModal" class="modal hidden">
+        <div class="modal-content w-full max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-red-600">תיעוד הצלחה חדשה</h3>
+                <button onclick="closeSuccessForm()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form onsubmit="submitSuccess(event)">
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-medium mb-3">בחרו קטגוריה:</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="category-btn" data-category="זיהוי רגש">
+                            <i class="fas fa-heart text-red-500 text-lg mb-2"></i>
+                            <div class="text-sm font-medium">זיהוי רגש</div>
+                        </div>
+                        <div class="category-btn" data-category="יזימת אינטראקציה">
+                            <i class="fas fa-handshake text-blue-500 text-lg mb-2"></i>
+                            <div class="text-sm font-medium">יזימת אינטראקציה</div>
+                        </div>
+                        <div class="category-btn" data-category="דיאלוג פנימי חיובי">
+                            <i class="fas fa-comments text-green-500 text-lg mb-2"></i>
+                            <div class="text-sm font-medium">דיאלוג פנימי חיובי</div>
+                        </div>
+                        <div class="category-btn" data-category="תחושת שייכות וביטחון">
+                            <i class="fas fa-shield-alt text-purple-500 text-lg mb-2"></i>
+                            <div class="text-sm font-medium">תחושת שייכות וביטחון</div>
+                        </div>
+                        <div class="category-btn" data-category="השתתפות פעילה">
+                            <i class="fas fa-users text-orange-500 text-lg mb-2"></i>
+                            <div class="text-sm font-medium">השתתפות פעילה</div>
+                        </div>
+                        <div class="category-btn" data-category="ויסות רגשי">
+                            <i class="fas fa-balance-scale text-teal-500 text-lg mb-2"></i>
+                            <div class="text-sm font-medium">ויסות רגשי</div>
+                        </div>
+                        <div class="category-btn" data-category="התמודדות עם שינוי">
+                            <i class="fas fa-sync-alt text-indigo-500 text-lg mb-2"></i>
+                            <div class="text-sm font-medium">התמודדות עם שינוי</div>
+                        </div>
+                        <div class="category-btn" data-category="פתרון קונפליקטים">
+                            <i class="fas fa-puzzle-piece text-pink-500 text-lg mb-2"></i>
+                            <div class="text-sm font-medium">פתרון קונפליקטים</div>
+                        </div>
+                        <div class="category-btn" data-category="התמודדות עם תסכול">
+                            <i class="fas fa-mountain text-yellow-600 text-lg mb-2"></i>
+                            <div class="text-sm font-medium">התמודדות עם תסכול</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-medium mb-2">תארו את ההצלחה:</label>
+                    <textarea id="successDescription" rows="4" required 
+                        class="w-full px-4 py-3 border-2 border-orange-200 rounded-lg focus:border-red-500 focus:outline-none"
+                        placeholder="מה קרה? איך הילד/ה הגיב/ה?"></textarea>
+                </div>
+
+                <button type="submit" class="w-full success-btn">
+                    <i class="fas fa-save ml-2"></i>
+                    שמור הצלחה
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="modal hidden">
+        <div class="modal-content w-full max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-red-600">היסטוריית הצלחות</h3>
+                <button onclick="closeHistory()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="historyList" class="space-y-4 max-h-96 overflow-y-auto">
+                <!-- History items will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div id="statsModal" class="modal hidden">
+        <div class="modal-content w-full max-w-lg">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-red-600">נתונים והתקדמות</h3>
+                <button onclick="closeStats()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="chart-container mb-4">
+                <canvas id="categoryChart"></canvas>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="stat-card">
+                    <div class="text-2xl font-bold text-blue-600" id="avgWeekly">2.5</div>
+                    <div class="text-sm text-gray-600">ממוצע שבועי</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-2xl font-bold text-green-600" id="longestStreak">7</div>
+                    <div class="text-sm text-gray-600">רצף הארוך ביותר</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Therapist Access (Hidden URL: /therapists) -->
+    <div id="therapistLoginScreen" class="min-h-screen flex-col items-center justify-center p-4 hidden">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+            <img src="https://cdn1.genspark.ai/user-upload-image/rmbg_generated/0_5b77bea6-587c-4ceb-8c88-afb24fbccc17" alt="לוגו נמר מחוק" class="w-24 h-auto mx-auto mb-6">
+            
+            <h2 class="text-2xl font-bold text-red-600 text-center mb-6">כניסה למטפלים</h2>
+            
+            <form onsubmit="loginTherapist(event)" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">קוד גישה</label>
+                    <input type="password" id="therapistCode" required 
+                        class="w-full px-4 py-3 border-2 border-orange-200 rounded-lg focus:border-red-500 focus:outline-none"
+                        placeholder="הזינו את קוד הגישה">
+                </div>
+                
+                <button type="submit" class="w-full success-btn">
+                    <i class="fas fa-user-md ml-2"></i>
+                    כניסה
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Therapist Dashboard -->
+    <div id="therapistDashboard" class="min-h-screen therapist-dashboard p-4 hidden">
+        <div class="max-w-6xl mx-auto">
+            <div class="bg-white rounded-2xl p-6 mb-6 shadow-sm">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <img src="https://cdn1.genspark.ai/user-upload-image/rmbg_generated/0_5b77bea6-587c-4ceb-8c88-afb24fbccc17" alt="לוגו נמר מחוק" class="w-16 h-auto mb-2">
+                        <h1 class="text-2xl font-bold text-red-600">לוח בקרה מטפלים</h1>
+                        <p class="text-gray-600">מעקב ופיקוח על התקדמות החניכים</p>
+                    </div>
+                    <button onclick="logout()" class="px-4 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-50">
+                        <i class="fas fa-sign-out-alt ml-1"></i>
+                        יציאה
+                    </button>
+                </div>
+            </div>
+
+            <!-- Therapist Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="stat-card">
+                    <div class="text-2xl font-bold text-blue-600">12</div>
+                    <div class="text-sm text-gray-600">משפחות פעילות</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-2xl font-bold text-green-600">147</div>
+                    <div class="text-sm text-gray-600">סה"כ הצלחות</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-2xl font-bold text-orange-600">כתום</div>
+                    <div class="text-sm text-gray-600">רמת חגורה ממוצעת</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-2xl font-bold text-purple-600">85%</div>
+                    <div class="text-sm text-gray-600">השתתפות שבועית</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="chart-container">
+                    <h3 class="text-lg font-bold mb-4">התפלגות לפי קטגוריות</h3>
+                    <canvas id="therapistCategoryChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="text-lg font-bold mb-4">התקדמות שבועית</h3>
+                    <canvas id="weeklyProgressChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Families List -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm">
+                <h3 class="text-lg font-bold mb-4">רשימת משפחות</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b">
+                                <th class="text-right py-2">שם החניך</th>
+                                <th class="text-right py-2">רמת חגורה</th>
+                                <th class="text-right py-2">הצלחות השבוע</th>
+                                <th class="text-right py-2">סה"כ הצלחות</th>
+                                <th class="text-right py-2">פעילות אחרונה</th>
+                            </tr>
+                        </thead>
+                        <tbody id="familiesList">
+                            <!-- Families data will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Animation -->
+    <div id="successAnimation" class="modal hidden">
+        <div class="text-center">
+            <div class="text-8xl mb-4">🎉</div>
+            <h2 class="text-3xl font-bold text-green-600 mb-2">כל הכבוד!</h2>
+            <p class="text-xl text-gray-700 mb-4">ההצלחה נשמרה בהצלחה</p>
+            <p id="levelUpMessage" class="text-lg text-orange-600 hidden">עליתם בדרגה!</p>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let userType = null;
+        let successes = [];
+        let selectedCategory = null;
+
+        // Belt progression system
+        const belts = [
+            { name: 'חגורה לבנה', color: '#f8fafc', letter: 'ל', threshold: 0 },
+            { name: 'חגורה צהובה', color: '#fef3c7', letter: 'צ', threshold: 5 },
+            { name: 'חגורה כתומה', color: '#fed7aa', letter: 'כ', threshold: 10 },
+            { name: 'חגורה ירוקה', color: '#dcfce7', letter: 'י', threshold: 15 },
+            { name: 'חגורה כחולה', color: '#dbeafe', letter: 'כ', threshold: 20 },
+            { name: 'חגורה חומה', color: '#d6d3d1', letter: 'ח', threshold: 25 },
+            { name: 'חגורה שחורה', color: '#374151', letter: 'ש', threshold: 30 }
+        ];
+
+        // Initialize app
+        function init() {
+            loadUserData();
+            
+            // Check if URL is for therapists
+            if (window.location.hash === '#therapists' || window.location.pathname.includes('therapists')) {
+                showTherapistLogin();
+            } else {
+                showWelcome();
+            }
+        }
+
+        // Navigation functions
+        function showWelcome() {
+            hideAllScreens();
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+            document.getElementById('welcomeScreen').classList.add('flex');
+        }
+
+        function showFamilyLogin() {
+            hideAllScreens();
+            document.getElementById('familyLoginScreen').classList.remove('hidden');
+            document.getElementById('familyLoginScreen').classList.add('flex');
+        }
+
+        function showTherapistLogin() {
+            hideAllScreens();
+            document.getElementById('therapistLoginScreen').classList.remove('hidden');
+            document.getElementById('therapistLoginScreen').classList.add('flex');
+        }
+
+        function showFamilyDashboard() {
+            hideAllScreens();
+            document.getElementById('familyDashboard').classList.remove('hidden');
+            updateFamilyDashboard();
+        }
+
+        function showTherapistDashboard() {
+            hideAllScreens();
+            document.getElementById('therapistDashboard').classList.remove('hidden');
+            updateTherapistDashboard();
+        }
+
+        function hideAllScreens() {
+            const screens = ['welcomeScreen', 'familyLoginScreen', 'familyDashboard', 'therapistLoginScreen', 'therapistDashboard'];
+            screens.forEach(screen => {
+                document.getElementById(screen).classList.add('hidden');
+                document.getElementById(screen).classList.remove('flex');
+            });
+        }
+
+        // Login functions
+        function loginFamily(event) {
+            event.preventDefault();
+            const childName = document.getElementById('childName').value;
+            const password = document.getElementById('familyPassword').value;
+
+            // Simple validation (in real app, this would be server-side)
+            if (childName && password) {
+                currentUser = childName;
+                userType = 'family';
+                saveUserData();
+                showFamilyDashboard();
+            } else {
+                alert('אנא מלאו את כל השדות');
+            }
+        }
+
+        function loginTherapist(event) {
+            event.preventDefault();
+            const code = document.getElementById('therapistCode').value;
+
+            // Simple access code validation
+            if (code === 'staff2024') {
+                currentUser = 'therapist';
+                userType = 'therapist';
+                saveUserData();
+                showTherapistDashboard();
+            } else {
+                alert('קוד גישה שגוי');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            userType = null;
+            localStorage.removeItem('tigerBeltUser');
+            showWelcome();
+        }
+
+        // Data management
+        function saveUserData() {
+            const userData = {
+                currentUser,
+                userType,
+                successes,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('tigerBeltUser', JSON.stringify(userData));
+        }
+
+        function loadUserData() {
+            const saved = localStorage.getItem('tigerBeltUser');
+            if (saved) {
+                const data = JSON.parse(saved);
+                currentUser = data.currentUser;
+                userType = data.userType;
+                successes = data.successes || [];
+            }
+        }
+
+        // Family Dashboard functions
+        function updateFamilyDashboard() {
+            if (!currentUser) return;
+
+            document.getElementById('childNameDisplay').textContent = `יומן ההצלחות של ${currentUser}`;
+            
+            // Update belt level
+            const currentBelt = getCurrentBelt();
+            const beltElement = document.getElementById('currentBelt');
+            beltElement.textContent = currentBelt.letter;
+            beltElement.style.backgroundColor = currentBelt.color;
+            beltElement.style.color = currentBelt.name === 'חגורה שחורה' ? 'white' : 'black';
+            
+            document.getElementById('beltName').textContent = currentBelt.name;
+            
+            // Update progress
+            const progress = getProgressToNextBelt();
+            document.getElementById('progressBar').style.width = `${progress.percentage}%`;
+            
+            // Update stats
+            document.getElementById('weeklyCount').textContent = getWeeklySuccesses();
+            document.getElementById('totalCount').textContent = successes.length;
+            document.getElementById('beltLevel').textContent = getBeltIndex() + 1;
+        }
+
+        function getCurrentBelt() {
+            const totalSuccesses = successes.length;
+            for (let i = belts.length - 1; i >= 0; i--) {
+                if (totalSuccesses >= belts[i].threshold) {
+                    return belts[i];
+                }
+            }
+            return belts[0];
+        }
+
+        function getBeltIndex() {
+            const totalSuccesses = successes.length;
+            for (let i = belts.length - 1; i >= 0; i--) {
+                if (totalSuccesses >= belts[i].threshold) {
+                    return i;
+                }
+            }
+            return 0;
+        }
+
+        function getProgressToNextBelt() {
+            const currentIndex = getBeltIndex();
+            const totalSuccesses = successes.length;
+            
+            if (currentIndex >= belts.length - 1) {
+                return { current: 5, needed: 5, percentage: 100 };
+            }
+            
+            const currentBelt = belts[currentIndex];
+            const nextBelt = belts[currentIndex + 1];
+            const progressInCurrentLevel = totalSuccesses - currentBelt.threshold;
+            const neededForNext = nextBelt.threshold - currentBelt.threshold;
+            
+            return {
+                current: progressInCurrentLevel,
+                needed: neededForNext,
+                percentage: (progressInCurrentLevel / neededForNext) * 100
+            };
+        }
+
+        function getWeeklySuccesses() {
+            const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+            return successes.filter(s => new Date(s.timestamp) > oneWeekAgo).length;
+        }
+
+        // Success form functions
+        function showSuccessForm() {
+            document.getElementById('successModal').classList.remove('hidden');
+            selectedCategory = null;
+            updateCategoryButtons();
+        }
+
+        function closeSuccessForm() {
+            document.getElementById('successModal').classList.add('hidden');
+            document.getElementById('successDescription').value = '';
+            selectedCategory = null;
+            updateCategoryButtons();
+        }
+
+        function updateCategoryButtons() {
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.dataset.category === selectedCategory) {
+                    btn.classList.add('selected');
+                }
+            });
+        }
+
+        function submitSuccess(event) {
+            event.preventDefault();
+            
+            if (!selectedCategory) {
+                alert('אנא בחרו קטגוריה');
+                return;
+            }
+
+            const description = document.getElementById('successDescription').value;
+            const previousBeltIndex = getBeltIndex();
+
+            const success = {
+                id: Date.now(),
+                category: selectedCategory,
+                description: description,
+                timestamp: new Date().toISOString(),
+                childName: currentUser
+            };
+
+            successes.push(success);
+            saveUserData();
+
+            // Check for level up
+            const newBeltIndex = getBeltIndex();
+            const leveledUp = newBeltIndex > previousBeltIndex;
+
+            closeSuccessForm();
+            showSuccessAnimation(leveledUp);
+            updateFamilyDashboard();
+        }
+
+        function showSuccessAnimation(leveledUp) {
+            const modal = document.getElementById('successAnimation');
+            const levelUpMsg = document.getElementById('levelUpMessage');
+            
+            if (leveledUp) {
+                levelUpMsg.classList.remove('hidden');
+            } else {
+                levelUpMsg.classList.add('hidden');
+            }
+            
+            modal.classList.remove('hidden');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 3000);
+        }
+
+        // History functions
+        function showHistory() {
+            document.getElementById('historyModal').classList.remove('hidden');
+            updateHistoryList();
+        }
+
+        function closeHistory() {
+            document.getElementById('historyModal').classList.add('hidden');
+        }
+
+        function updateHistoryList() {
+            const historyList = document.getElementById('historyList');
+            const sortedSuccesses = [...successes].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            historyList.innerHTML = sortedSuccesses.map(success => `
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-medium text-gray-800">${success.category}</h4>
+                        <span class="text-sm text-gray-500">${formatDate(success.timestamp)}</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">${success.description}</p>
+                </div>
+            `).join('');
+        }
+
+        // Stats functions
+        function showStats() {
+            document.getElementById('statsModal').classList.remove('hidden');
+            updateStatsCharts();
+        }
+
+        function closeStats() {
+            document.getElementById('statsModal').classList.add('hidden');
+        }
+
+        function updateStatsCharts() {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            
+            // Count successes by category
+            const categoryCounts = {};
+            successes.forEach(success => {
+                categoryCounts[success.category] = (categoryCounts[success.category] || 0) + 1;
+            });
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryCounts),
+                    datasets: [{
+                        data: Object.values(categoryCounts),
+                        backgroundColor: [
+                            '#ef4444', '#f59e0b', '#10b981', '#3b82f6',
+                            '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Therapist Dashboard functions
+        function updateTherapistDashboard() {
+            updateTherapistCharts();
+            updateFamiliesList();
+        }
+
+        function updateTherapistCharts() {
+            // Category distribution chart
+            const ctx1 = document.getElementById('therapistCategoryChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['זיהוי רגש', 'יזימת אינטראקציה', 'דיאלוג חיובי', 'שייכות', 'השתתפות'],
+                    datasets: [{
+                        label: 'מספר הצלחות',
+                        data: [23, 19, 15, 12, 18],
+                        backgroundColor: '#ef4444'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Weekly progress chart
+            const ctx2 = document.getElementById('weeklyProgressChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['שבוע 1', 'שבוע 2', 'שבוע 3', 'שבוע 4'],
+                    datasets: [{
+                        label: 'הצלחות שבועיות',
+                        data: [12, 19, 15, 22],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function updateFamiliesList() {
+            const familiesList = document.getElementById('familiesList');
+            const sampleFamilies = [
+                { name: 'יואב כהן', belt: 'כתום', weekly: 3, total: 12, lastActive: '2 ימים' },
+                { name: 'נועה לוי', belt: 'ירוק', weekly: 2, total: 18, lastActive: '1 יום' },
+                { name: 'איתי גבע', belt: 'צהוב', weekly: 4, total: 8, lastActive: '3 ימים' },
+                { name: 'תמר רוזן', belt: 'כחול', weekly: 1, total: 22, lastActive: '5 ימים' }
+            ];
+
+            familiesList.innerHTML = sampleFamilies.map(family => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3">${family.name}</td>
+                    <td class="py-3">חגורה ${family.belt}</td>
+                    <td class="py-3">${family.weekly}</td>
+                    <td class="py-3">${family.total}</td>
+                    <td class="py-3">${family.lastActive}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Utility functions
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('he-IL');
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Category selection
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.category-btn')) {
+                const btn = e.target.closest('.category-btn');
+                selectedCategory = btn.dataset.category;
+                updateCategoryButtons();
+            }
+        });
+
+        // Special URL handling for therapists
+        if (window.location.hash === '#therapists') {
+            window.addEventListener('load', showTherapistLogin);
+        }
+    </script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDjXH2j7ZzpLHiW6uqNzS3XLC%2BAjgkKM4xvQSF2eBR8qt6QzOOkqfID3fEbyUyraiG%2BMo4ewD1ufUcp9MvArk9S%2BzEB%2BDhYMKAiA%2BjaUCFjmwQ3sflMVvzTO30U2pWqekUjCYza4mECH3wsaVerxXt0OPMSfk2S3sBgANWlzw1Vuj%2BD7%2BJXIDCikFddXyOUmydoWNxxsXOXNiqkVaXRq8mBtsMHiMuFMsFt19bc%2FfA5oogatpkfEMMbLz7M6QrToQ4byk7ZBmVPb2ribzA7spHS59wfycILEgVev8xg5%2FRRiQWPkn%2BgLVpagJ78Z1V8%2FWr8ypxiRkqwebNk2NNwo%2BmARL255GHZ4ds710P6Ye9%2B%2F5TARHTZznvaMfODZuAqbsF4pu9rz8j23hMlEppXO4pjF6LTfKXjFKeLlAxGUJ%2FW%2FlJpKlQOleD6%2FJa%2FSyj%2FEIV52DVxf2VPfnyZSMDxgH8mzKgupyokECqOeaCcfWdAmWY1Qe3xJLlfXUcXXGcqoJyvFmw1ABowHOdgS%2F9Xolgc4%3D";
+        window.__genspark_locale = "en-US";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDjXH2j7ZzpLHiW6uqNzS3XLC+AjgkKM4xvQSF2eBR8qt6QzOOkqfID3fEbyUyraiG+Mo4ewD1ufUcp9MvArk9S+zEB+DhYMKAiA+jaUCFjmwQ3sflMVvzTO30U2pWqekUjCYza4mECH3wsaVerxXt0OPMSfk2S3sBgANWlzw1Vuj+D7+JXIDCikFddXyOUmydoWNxxsXOXNiqkVaXRq8mBtsMHiMuFMsFt19bc/fA5oogatpkfEMMbLz7M6QrToQ4byk7ZBmVPb2ribzA7spHS59wfycILEgVev8xg5/RRiQWPkn+gLVpagJ78Z1V8/Wr8ypxiRkqwebNk2NNwo+mARL255GHZ4ds710P6Ye9+/5TARHTZznvaMfODZuAqbsF4pu9rz8j23hMlEppXO4pjF6LTfKXjFKeLlAxGUJ/W/lJpKlQOleD6/Ja/Syj/EIV52DVxf2VPfnyZSMDxgH8mzKgupyokECqOeaCcfWdAmWY1Qe3xJLlfXUcXXGcqoJyvFmw1ABowHOdgS/9Xolgc4=";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
